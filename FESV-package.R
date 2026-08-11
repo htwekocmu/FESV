@@ -1,0 +1,45 @@
+#' FESV: Fixed Effects Covariate Selection Using Shapley Values
+#'
+#' A cooperative game-theoretic framework for covariate selection in two-way
+#' fixed effects (FE) panel data models.
+#'
+#' In the panel model \eqn{y_{it} = \alpha_i + \gamma_t + \mathbf{x}_{it}^\top
+#' \boldsymbol{\beta} + \varepsilon_{it}}, the unit effects \eqn{\alpha_i} and
+#' time effects \eqn{\gamma_t} are held \emph{fixed}: they are partialled out
+#' and are never candidates for selection. The candidate covariates are the
+#' \emph{players} of a cooperative game whose characteristic function is
+#'
+#' \deqn{v(S) = \text{fit}(S \mid FE) - \text{fit}(\emptyset \mid FE),
+#'       \qquad v(\emptyset) = 0,}
+#'
+#' where \eqn{\text{fit}} is a goodness-of-fit statistic net of the fixed
+#' effects (adjusted \eqn{R^2} by default). The Shapley value
+#' \eqn{\phi_j = \sum_{S \subseteq N \setminus \{j\}} \frac{|S|!(p-|S|-1)!}{p!}
+#' \big[v(S \cup \{j\}) - v(S)\big]} allocates to each covariate its average
+#' marginal contribution over all coalitions.
+#'
+#' Two data-driven selection rules are provided:
+#' \itemize{
+#'   \item \strong{Rule A}: select covariate \eqn{j} if \eqn{\phi_j > 0}.
+#'   \item \strong{Rule B}: order covariates by \eqn{\phi} and maximise
+#'         \eqn{J(k) = v(M_k) - \gamma k}, where \eqn{M_k} is the top-\eqn{k}
+#'         coalition and \eqn{\gamma} is a penalty.
+#' }
+#'
+#' The implementation is fully frequentist. Exact Shapley values are computed
+#' for \eqn{p \le 20} covariates (via enumeration of all \eqn{2^p} coalitions);
+#' Monte Carlo permutation sampling handles larger \eqn{p}. Residual-bootstrap
+#' inference, game-theoretic diagnostics (efficiency, superadditivity, core
+#' membership), fixed-effects OLS on a selected coalition, and selection
+#' metrics (precision / recall / \eqn{F_1}) are included.
+#'
+#' @references
+#' Shapley, L. S. (1953). A value for \eqn{n}-person games. In H. W. Kuhn and
+#' A. W. Tucker (Eds.), \emph{Contributions to the Theory of Games}, Vol. 2,
+#' Princeton University Press, 307--317.
+#'
+#' Ko, H. (2026). Shapley-Value Covariate Selection for Panel Data Models: A
+#' Cooperative Game-Theoretic Approach.
+#'
+#' @keywords internal
+"_PACKAGE"
