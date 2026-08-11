@@ -1,0 +1,17 @@
+# R
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+.Rproj.user
+
+# Generated build artifacts
+*.tar.gz
+*.Rcheck/
+FESV_*.tar.gz
+src/*.o
+src/*.so
+
+# OS
+.DS_Store
+Thumbs.db

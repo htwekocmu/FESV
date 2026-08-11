@@ -1,0 +1,29 @@
+Package: FESV
+Type: Package
+Title: Fixed Effects Covariate Selection Using Shapley Values
+Version: 1.0.0
+Authors@R:
+    person("Htwe", "Ko", email = "htwe_k@cmu.ac.th", role = c("aut", "cre"))
+Description: A cooperative game-theoretic framework for covariate selection in
+    two-way fixed effects panel data models. Candidate covariates are treated
+    as players in a coalitional game whose characteristic function is the
+    improvement in a penalised goodness-of-fit statistic (adjusted R^2 by
+    default) relative to the fixed-effects-only baseline. The Shapley value
+    allocates each covariate's average marginal contribution across all
+    coalitions and provides two data-driven selection rules: (A) a positive
+    Shapley value and (B) a nested penalised criterion J(k) = v(M_k) - gamma*k.
+    The package provides exact enumeration for small covariate sets, Monte
+    Carlo permutation sampling for larger sets, residual-bootstrap inference,
+    fixed-effects OLS on selected coalitions, game-theoretic diagnostics, and
+    selection metrics. The method is fully frequentist.
+License: GPL (>= 3) | file LICENSE
+URL: https://github.com/htwekocmu/FESV
+BugReports: https://github.com/htwekocmu/FESV/issues
+Encoding: UTF-8
+Depends: R (>= 3.5.0)
+Imports: stats
+Suggests: testthat (>= 3.0.0), knitr, rmarkdown
+LazyData: true
+VignetteBuilder: knitr
+Config/testthat/edition: 3
+RoxygenNote: 7.3.3

@@ -1,0 +1,7 @@
+# Files that R CMD build should ignore
+^\.git$
+^\.github$
+^data-raw$
+^.*\.Rproj$
+^\.Rproj\.user$
+^README\.Rmd$
