@@ -1,0 +1,129 @@
+---
+title: "Introduction to FESV"
+author: "Htwe Ko"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to FESV}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
+                      fig.width = 6, fig.height = 4)
+```
+
+## What FESV does
+
+`FESV` performs covariate selection in two-way fixed effects panel models:
+
+$$
+y_{it} = \alpha_i + \gamma_t + \mathbf{x}_{it}^\top \boldsymbol{\beta}
+        + \varepsilon_{it}.
+$$
+
+The unit effects $\alpha_i$ and time effects $\gamma_t$ are **held fixed**:
+they are partialled out and are never candidates for selection. The candidate
+covariates are the *players* of a cooperative game whose characteristic
+function is
+
+$$
+v(S) = \text{Adj-R}^2(S \mid FE) - \text{Adj-R}^2(\emptyset \mid FE),
+\qquad v(\emptyset) = 0.
+$$
+
+Because the adjusted $R^2$ penalises degrees of freedom, adding an irrelevant
+covariate *lowers* $v$, so noise players receive negative Shapley values. The
+Shapley value of covariate $j$ is its average marginal contribution over all
+coalitions:
+
+$$
+\phi_j = \sum_{S \subseteq N \setminus \{j\}}
+  \frac{|S|! (p - |S| - 1)!}{p!}
+  \left[ v(S \cup \{j\}) - v(S) \right].
+$$
+
+## Worked example on simulated data
+
+```{r}
+library(FESV)
+set.seed(1)
+
+N <- 40; T <- 15
+unit <- rep(1:N, times = T)
+time <- rep(1:T, each = N)
+beta <- c(0.8, 0, 0.6, 0, -0.5, 0)
+X <- matrix(rnorm(N * T * length(beta)), ncol = length(beta))
+colnames(X) <- paste0("x", 1:length(beta))
+y <- as.vector(X %*% beta) + rnorm(N * T) + unit * 0.5 + time * 0.3
+
+res <- fe_shapley_covariate_selection(y, X, unit, time,
+                                      exact = TRUE, gamma = 0.01)
+```
+
+### Shapley values
+
+```{r}
+sort(res$shapley_values, decreasing = TRUE)
+```
+
+The active covariates `x1`, `x3`, `x5` have clearly positive values, while the
+noise covariates `x2`, `x4`, `x6` have values at or below zero.
+
+### Selection rules
+
+```{r}
+res$selected_sign    # Rule A: phi_j > 0
+res$selected_nested  # Rule B: nested penalised criterion
+```
+
+Both rules recover the true active set.
+
+### Efficiency identity
+
+The sum of the Shapley values equals the grand coalition value $v(N)$:
+
+```{r}
+res$efficiency_gap
+```
+
+### Diagnostics
+
+```{r}
+res$superadditivity
+res$core
+```
+
+## Bootstrap inference
+
+```{r, eval = FALSE}
+boot <- bootstrap_shapley(y, X, unit, time, B = 999)
+boot$ci
+boot$se
+```
+
+## Real-data application
+
+The package ships three country panels. Run the full workflow on the pooled
+sample:
+
+```{r}
+data(all_panel)
+d <- all_panel
+X  <- as.matrix(d[, c("FDI", "INF", "POP", "TOP", "UR", "EXR")])
+out <- fe_shapley_covariate_selection(d$Income, X, d$id, d$year,
+                                      exact = TRUE, gamma = 0.01,
+                                      verbose = FALSE)
+sort(out$shapley_values, decreasing = TRUE)
+out$selected_nested
+```
+
+## References
+
+Shapley, L. S. (1953). A value for *n*-person games. In H. W. Kuhn and
+A. W. Tucker (Eds.), *Contributions to the Theory of Games*, Vol. 2, Princeton
+University Press, 307-317.
+
+Ko, H. (2026). *Shapley-Value Covariate Selection for Panel Data Models: A
+Cooperative Game-Theoretic Approach.* Working paper.
